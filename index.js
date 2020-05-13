@@ -20,59 +20,56 @@ bot.on("message", async msg=>{
     // CHECK MESSAGE STARTS WITH PREFIX
     if(msg.content.indexOf(prefix) !== 0) return;
 
-    // HANDLE MESSAGE
-    else  {
+    // COMMAND ARGUMENTS
+    const args = msg.content.slice(prefix.length).trim().split(/ +/g);
 
-          // COMMAND ARGUMENTS
-          const args = msg.content.slice(prefix.length).trim().split(/ +/g);
+    if(args[0] == "stats"){
+      msg.channel.startTyping();
 
-          if(args[0] == "nasa"){
-            msg.channel.startTyping();
-            if(args[1] == "img"){
+      // Command for League of Legends
+      if(args[1] == "lol"){
 
-                /*
-                + "\n" + "LP: " + info[0].leaguePoints
-                + "\n" + "W/L: " + info[0].wins + " W / " + info[0].losses + " L"
-                */
+        try{
 
-              info = await getData();
-              const embed = new Discord.MessageEmbed()
-                .setColor(0x00AE86)
-                .setTitle("Profile: " + info[0].summonerName)
-                .setDescription("Here you go, summoner!")
-                .addField('\u200b', '\u200b')
-                .setThumbnail('https://i.imgur.com/wSTFkRM.png')
-                .addFields(
-              		{ name: 'Rank', value: info[0].tier + " " + info[0].rank, inline: true},
-                  { name: 'LP', value: info[0].leaguePoints, inline: true},
-                  { name: "W/L", value: info[0].wins + " W / " + info[0].losses + " L", inline: true},
-              		{ name: '\u200B', value: '\u200B' },
-	               )
-                .setFooter("Jon and Ric")
-                .setTimestamp()
-            msg.channel.send(embed);
-              // msg.channel.send("User Name: " + newData[0].summonerName + "\n" +
-              //                  "LP: " + newData[0].leaguePoints + "\n" +
-              //                  "Rank: " + newData[0].tier + " " + newData[0].rank);
+        info = await getData();
+        embed = getEmbed(info);
+        msg.channel.send(embed);
 
+      }catch(err){msg.channel.send("Error Occured" + err); }
 
-              }else{msg.channel.send("invalid response"); }
+      }else{msg.channel.send("invalid response"); }
 
-          }
-
-          msg.channel.stopTyping();
-          }
-
+    }
+    msg.channel.stopTyping();
 
 });
 
+// getes data from API, returns it into usable json
 async function getData() {
   const response = await fetch(site);
   const data = await response.json();
   return data
 }
 
+// creates an embed page
+function getEmbed(info){
+  const embed = new Discord.MessageEmbed()
 
+    .setColor(0x00AE86)
+    .setTitle("Profile: " + info[0].summonerName)
+    .setDescription("Here you go, summoner!")
+    .addField('\u200b', '\u200b')
+    .setThumbnail('https://i.imgur.com/wSTFkRM.png')
+    .addFields(
+      { name: 'Rank', value: info[0].tier + " " + info[0].rank, inline: true},
+      { name: 'LP', value: info[0].leaguePoints, inline: true},
+      { name: "W/L", value: info[0].wins + " W / " + info[0].losses + " L", inline: true},
+      { name: '\u200B', value: '\u200B' },
+     )
+    .setFooter("Jon and Ric")
+    .setTimestamp()
 
+    return embed
+}
 
 bot.login(token);
